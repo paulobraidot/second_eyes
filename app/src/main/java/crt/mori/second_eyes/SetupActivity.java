@@ -1,10 +1,16 @@
 package crt.mori.second_eyes;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,10 +25,32 @@ public class SetupActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
     }
 
+    private static final int CAMERA_PERMISSION_REQUEST_CODE = 200;
+
     public void startCamera(View view) {
-        //After Start Camera button is hit
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CAMERA},
+                    CAMERA_PERMISSION_REQUEST_CODE);
+        } else {
+            launchCameraActivity();
+        }
+    }
+
+    private void launchCameraActivity() {
         Intent startCam = new Intent("crt.mori.second_eyes.CAMERAACTIVITY");
         startActivity(startCam);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                launchCameraActivity();
+            }
+        }
     }
 
     @Override
